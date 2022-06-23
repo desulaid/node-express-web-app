@@ -1,0 +1,13 @@
+doctype html
+html(lang="ru")
+head
+    title #{title}
+    meta(charset='UTF-8')
+    link(rel='stylesheet', href='/css/styles.css')
+body
+    div.content
+        if value == -1
+            p Пользователя #{name} нет
+        else
+            p Пользователь #{name} есть
+        a(href='/') Вернуться
