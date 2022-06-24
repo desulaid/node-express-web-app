@@ -7,7 +7,10 @@ head
 body
     div.content
         if value == -1
-            p Пользователя #{name} нет
+            if name
+                p Пользователя #{name} нет
+            else
+                p Ой, вы ничего не ввели
         else
             p Пользователь #{name} есть
-        a(href='/') Вернуться
+        a(href='/') &larr; Вернуться
