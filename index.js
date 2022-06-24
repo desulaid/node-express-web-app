@@ -4,7 +4,7 @@ const path = require('path')
 const express = require('express')
 const app = express()
 
-let getUset_Exec = (callback) => {
+let exec_netUser = (callback) => {
     exec('net user', { encoding: "buffer" }, (error, stdout, stderr) => {
         if (error) {
             callback(stderr, null)
@@ -14,28 +14,18 @@ let getUset_Exec = (callback) => {
     });
 }
 
-// https://cs4.pikabu.ru/post_img/big/2014/12/19/10/1419005128_596027900.jpg
-let getUsers = (callback) => {
-    getUset_Exec((error, resource) => {
-        if (!error) {
-            let buff = ''
+let usersTable = (callback) => (exec_netUser((err, res) => {
+    if (err) {
+        console.log(`Error: ${err}`)
+    }
+    else {
+        callback(res
+            .slice(res.lastIndexOf('-') + 1)
+            .match(/([A-Za-zА-Яа-я0-9_]+)/g)
+        )
+    }
+}))
 
-            buff = resource.slice(resource.indexOf('WDAGUtilityAccount') + 'WDAGUtilityAccount'.length)
-            buff = buff.replace(/\s+/g, ' ').trim()
-            buff = buff.slice(0, buff.indexOf(' The command completed successfully.'))
-
-            buff = buff.split(" ")
-
-            for (let i = 1; i < buff.length; i += 2) {
-                delete buff[i]
-            }
-
-            buff = buff.filter((f) => { return f !== null })
-
-            callback(buff)
-        }
-    })
-}
 
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -53,7 +43,7 @@ app.route('/users')
     .post((request, response) => {
         let name = request.body.name
 
-        getUsers((userName) => {
+        usersTable((userName) => {
             response.render('users', {
                 'title': `Пользователь ${name}`,
                 'value': userName.indexOf(name),
